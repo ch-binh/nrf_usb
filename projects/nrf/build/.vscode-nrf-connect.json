@@ -9,7 +9,7 @@
   "optimizations": "debug",
   "cmakeArgs": [],
   "confFiles": [
-    "prj.conf"
+    "usbd_next_prj.conf"
   ],
   "buildDirectory": "build",
   "kconfigFragments": [],

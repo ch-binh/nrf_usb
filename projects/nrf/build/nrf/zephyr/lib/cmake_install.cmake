@@ -69,6 +69,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/lib/net_buf/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/lib/os/cmake_install.cmake")
 endif()
 

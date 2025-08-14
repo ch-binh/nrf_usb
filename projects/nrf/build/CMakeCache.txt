@@ -82,7 +82,7 @@ CONFIG_DEBUG_OPTIMIZATIONS:UNINITIALIZED=y
 CONFIG_DEBUG_THREAD_INFO:UNINITIALIZED=y
 
 //No help, variable specified on the command line.
-CONF_FILE:UNINITIALIZED=prj.conf
+CONF_FILE:UNINITIALIZED=usbd_next_prj.conf
 
 //No help, variable specified on the command line.
 DTC_OVERLAY_FILE:UNINITIALIZED=app.overlay

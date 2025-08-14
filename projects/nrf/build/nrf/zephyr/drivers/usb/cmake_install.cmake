@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/drivers/usb/device/cmake_install.cmake")
+  include("D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/drivers/usb/udc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)

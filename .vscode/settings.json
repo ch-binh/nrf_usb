@@ -2,5 +2,9 @@
   "nrf-connect.applications": [
     "${workspaceFolder}\\projects\\nrf"
   ],
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "files.associations": {
+    ".gitmessage": "git-commit",
+    "ring_buffer.h": "c"
+  }
 }

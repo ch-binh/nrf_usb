@@ -78,6 +78,7 @@ linker_zephyr_pre0.cmd: \
  C:/ncs/v3.0.2/zephyr/include/zephyr/linker/kobject-data.ld \
  C:/ncs/v3.0.2/zephyr/include/zephyr/linker/cplusplus-ram.ld \
  D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/include/generated/snippets-data-sections.ld \
+ c:\ncs\v3.0.2\zephyr\subsys\usb\device_next\usbd_data.ld \
  D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/include/generated/snippets-sections.ld \
  c:\ncs\v3.0.2\zephyr\soc\nordic\common\arm_platform_init.ld \
  C:/ncs/v3.0.2/zephyr/include/zephyr/linker/intlist.ld \

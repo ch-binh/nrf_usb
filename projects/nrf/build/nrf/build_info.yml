@@ -39,11 +39,11 @@ cmake:
   kconfig:
     files:
      - C:/ncs/v3.0.2/zephyr/boards/nordic/nrf52840dk/nrf52840dk_nrf52840_defconfig
-     - D:/Projects/nrf_usb/projects/nrf/prj.conf
+     - D:/Projects/nrf_usb/projects/nrf/usbd_next_prj.conf
      - D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/misc/generated/extra_kconfig_options.conf
      - D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr/.config.sysbuild
     user-files:
-     - prj.conf
+     - usbd_next_prj.conf
   toolchain:
     name: zephyr
     path: C:/ncs/toolchains/0b393f9e1b/opt/zephyr-sdk

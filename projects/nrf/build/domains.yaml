@@ -1,0 +1,7 @@
+default: nrf
+build_dir: D:/Projects/nrf_usb/projects/nrf/build
+domains:
+  - name: nrf
+    build_dir: D:/Projects/nrf_usb/projects/nrf/build/nrf
+flash_order:
+  - nrf

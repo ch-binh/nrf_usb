@@ -20,6 +20,6 @@ cmake:
   sysbuild: true
 version: 0.1.0
 west:
-  command: C:\ncs\toolchains\0b393f9e1b\opt\bin\Scripts\west build --build-dir d:/Projects/nrf_usb/projects/nrf/build d:/Projects/nrf_usb/projects/nrf --pristine --board nrf52840dk/nrf52840 -- -DCONFIG_DEBUG_OPTIMIZATIONS=y -DCONFIG_DEBUG_THREAD_INFO=y -DCONF_FILE=usbd_next_prj.conf -DDTC_OVERLAY_FILE=app.overlay -DBOARD_ROOT=c:/ncs/custom;c:/z_my_zephyr_projects/my_board;d:/personalprojects/zephyr_boards
+  command: C:\ncs\toolchains\0b393f9e1b\opt\bin\Scripts\west build --build-dir d:/Projects/nrf_usb/projects/nrf/build d:/Projects/nrf_usb/projects/nrf --pristine --board nrf52840dk/nrf52840 --sysbuild -- -DCONF_FILE=usbd_next_prj.conf -DDTC_OVERLAY_FILE=app.overlay -DCONFIG_DEBUG_OPTIMIZATIONS=y -DCONFIG_DEBUG_THREAD_INFO=y -DBOARD_ROOT=c:/ncs/custom;c:/z_my_zephyr_projects/my_board;d:/personalprojects/zephyr_boards
   topdir: c:\ncs\v3.0.2
   version: 1.2.0

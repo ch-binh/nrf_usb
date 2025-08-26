@@ -614,7 +614,7 @@ WEST:INTERNAL=C:/ncs/toolchains/0b393f9e1b/opt/bin/python.exe;-m;west
 //shared var
 ZEPHYR_BINARY_DIR:INTERNAL=D:/Projects/nrf_usb/projects/nrf/build/nrf/zephyr
 //Cached environment variable ZEPHYR_SDK_INSTALL_DIR
-ZEPHYR_SDK_INSTALL_DIR:INTERNAL=C:\ncs\toolchains\0b393f9e1b\opt\zephyr-sdk
+ZEPHYR_SDK_INSTALL_DIR:INTERNAL=c:\ncs\toolchains\0b393f9e1b\opt\zephyr-sdk
 //Cached environment variable ZEPHYR_TOOLCHAIN_VARIANT
 ZEPHYR_TOOLCHAIN_VARIANT:INTERNAL=zephyr
 _Python3_EXECUTABLE:INTERNAL=C:/ncs/toolchains/0b393f9e1b/opt/bin/python.exe

@@ -7,7 +7,9 @@
     "c:\\ncs\\v3.0.2\\zephyr\\boards\\nordic\\nrf52840dk"
   ],
   "optimizations": "debug",
-  "cmakeArgs": [],
+  "cmakeArgs": [
+    "-DCONFIG_DEBUG_THREAD_INFO=y"
+  ],
   "confFiles": [
     "usbd_next_prj.conf"
   ],

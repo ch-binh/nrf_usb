@@ -1,16 +1,21 @@
-/*
- * Copyright (c) 2019 Intel Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 /**
+ *******************************************************************************
  * @file
  * @brief Sample echo app for CDC ACM class
  *
  * Sample app for USB CDC ACM class driver. The received data is echoed back
  * to the serial port.
+ * @details This file implements functions declared in `template_module.h`.
+ *          Structured for maintainable and modular embedded C development.
+ *
+ * @date    2025/07/04
+ * @author  [Your Name]
+ * @version 1.0.0
+ * @license MIT
+ *******************************************************************************
  */
+
+/* Includes ----------------------------------------------------------------- */
 
 #include <sample_usbd.h>
 
@@ -21,106 +26,102 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/ring_buffer.h>
 
-#include <zephyr/usb/usb_device.h>
-#include <zephyr/usb/usbd.h>
 #include <zephyr/logging/log.h>
+
+/* Private includes --------------------------------------------------------- */
+#include "main.h"
+
+#include "hw/hal/hal_usbd.h"
+
 LOG_MODULE_REGISTER(cdc_acm_echo, LOG_LEVEL_INF);
 
-const struct device *const uart_dev = DEVICE_DT_GET_ONE(zephyr_cdc_acm_uart);
-
+/* Private defines ---------------------------------------------------------- */
 #define RING_BUF_SIZE 1024
-uint8_t ring_buffer[RING_BUF_SIZE];
 
-struct ring_buf ringbuf;
-
-static bool rx_throttled;
-
-static inline void print_baudrate(const struct device *dev)
-{
-  uint32_t baudrate;
-  int      ret;
-
-  ret = uart_line_ctrl_get(dev, UART_LINE_CTRL_BAUD_RATE, &baudrate);
-  if (ret)
-  {
-    LOG_WRN("Failed to get baudrate, ret code %d", ret);
-  }
-  else
-  {
-    LOG_INF("Baudrate %u", baudrate);
-  }
-}
-
-#if defined(CONFIG_USB_DEVICE_STACK_NEXT)
-static struct usbd_context *sample_usbd;
 K_SEM_DEFINE(dtr_sem, 0, 1);
 
-static void sample_msg_cb(struct usbd_context *const ctx, const struct usbd_msg *msg)
+/* Private macros ----------------------------------------------------------- */
+
+/* Private typedefs --------------------------------------------------------- */
+/* Private variables -------------------------------------------------------- */
+
+const struct device *const uart_dev = DEVICE_DT_GET_ONE(zephyr_cdc_acm_uart);
+uint8_t                    ring_buffer[RING_BUF_SIZE];
+struct ring_buf            ringbuf;
+static bool                rx_throttled;
+
+/* Private function prototypes ---------------------------------------------- */
+static void interrupt_handler(const struct device *dev, void *user_data);
+
+/* Exported functions ------------------------------------------------------- */
+/* Private function definitions --------------------------------------------- */
+
+int sys_init(void)
 {
-  LOG_INF("USBD message: %s", usbd_msg_type_string(msg->type));
+  int ret;
 
-  if (usbd_can_detect_vbus(ctx))
+  /* Init device*/
+  if (!device_is_ready(uart_dev))
   {
-    if (msg->type == USBD_MSG_VBUS_READY)
-    {
-      if (usbd_enable(ctx))
-      {
-        LOG_ERR("Failed to enable device support");
-      }
-    }
-
-    if (msg->type == USBD_MSG_VBUS_REMOVED)
-    {
-      if (usbd_disable(ctx))
-      {
-        LOG_ERR("Failed to disable device support");
-      }
-    }
+    LOG_ERR("CDC ACM device not ready");
+    return 0;
   }
 
-  if (msg->type == USBD_MSG_CDC_ACM_CONTROL_LINE_STATE)
-  {
-    uint32_t dtr = 0U;
+  /* Init USBD */
+  hal_usbd_init();
 
-    uart_line_ctrl_get(msg->dev, UART_LINE_CTRL_DTR, &dtr);
-    if (dtr)
-    {
-      k_sem_give(&dtr_sem);
-    }
+  ret = hal_usbd_enable();
+  if (ret != 0)
+  {
+    LOG_ERR("Failed to enable USB");
+    return 0;
   }
 
-  if (msg->type == USBD_MSG_CDC_ACM_LINE_CODING)
-  {
-    print_baudrate(msg->dev);
-  }
+  /* Init ring buf */
+  ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
+
+  /* Init UART */
+  return 1;
 }
 
-static int enable_usb_device_next(void)
+int main(void)
 {
-  int err;
+  int ret;
 
-  sample_usbd = sample_usbd_init_device(sample_msg_cb);
-  if (sample_usbd == NULL)
+  if (!sys_init())
   {
-    LOG_ERR("Failed to initialize USB device");
-    return -ENODEV;
+    LOG_ERR("Init module failed");
+    return 0;
   }
 
-  if (!usbd_can_detect_vbus(sample_usbd))
+  LOG_INF("Wait for DTR");
+
+  k_sem_take(&dtr_sem, K_FOREVER);
+
+  LOG_INF("DTR set");
+
+  /* They are optional, we use them to test the interrupt endpoint */
+  ret = uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DCD, 1);
+  if (ret)
   {
-    err = usbd_enable(sample_usbd);
-    if (err)
-    {
-      LOG_ERR("Failed to enable device support");
-      return err;
-    }
+    LOG_WRN("Failed to set DCD, ret code %d", ret);
   }
 
-  LOG_INF("USB device support enabled");
+  /* Wait 100ms for the host to do all settings */
+  k_msleep(100);
+
+  uart_irq_callback_set(uart_dev, interrupt_handler);
+
+  /* Enable rx interrupts */
+  uart_irq_rx_enable(uart_dev);
 
   return 0;
 }
-#endif /* defined(CONFIG_USB_DEVICE_STACK_NEXT) */
+
+/*
+ * STATIC FUNCTION
+ * =============================================================================
+ */
 
 static void interrupt_handler(const struct device *dev, void *user_data)
 {
@@ -192,77 +193,4 @@ static void interrupt_handler(const struct device *dev, void *user_data)
   }
 }
 
-int main(void)
-{
-  int ret;
-
-  if (!device_is_ready(uart_dev))
-  {
-    LOG_ERR("CDC ACM device not ready");
-    return 0;
-  }
-
-#if defined(CONFIG_USB_DEVICE_STACK_NEXT)
-  ret = enable_usb_device_next();
-#else
-  ret = usb_enable(NULL);
-#endif
-
-  if (ret != 0)
-  {
-    LOG_ERR("Failed to enable USB");
-    return 0;
-  }
-
-  ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
-
-  LOG_INF("Wait for DTR");
-
-#if defined(CONFIG_USB_DEVICE_STACK_NEXT)
-  k_sem_take(&dtr_sem, K_FOREVER);
-#else
-  while (true)
-  {
-    uint32_t dtr = 0U;
-
-    uart_line_ctrl_get(uart_dev, UART_LINE_CTRL_DTR, &dtr);
-    if (dtr)
-    {
-      break;
-    }
-    else
-    {
-      /* Give CPU resources to low priority threads. */
-      k_sleep(K_MSEC(100));
-    }
-  }
-#endif
-
-  LOG_INF("DTR set");
-
-  /* They are optional, we use them to test the interrupt endpoint */
-  ret = uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DCD, 1);
-  if (ret)
-  {
-    LOG_WRN("Failed to set DCD, ret code %d", ret);
-  }
-
-  ret = uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DSR, 1);
-  if (ret)
-  {
-    LOG_WRN("Failed to set DSR, ret code %d", ret);
-  }
-
-  /* Wait 100ms for the host to do all settings */
-  k_msleep(100);
-
-#ifndef CONFIG_USB_DEVICE_STACK_NEXT
-  print_baudrate(uart_dev);
-#endif
-  uart_irq_callback_set(uart_dev, interrupt_handler);
-
-  /* Enable rx interrupts */
-  uart_irq_rx_enable(uart_dev);
-
-  return 0;
-}
+/* End of File -------------------------------------------------------------- */

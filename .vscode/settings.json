@@ -5,6 +5,13 @@
   "cmake.ignoreCMakeListsMissing": true,
   "files.associations": {
     ".gitmessage": "git-commit",
-    "ring_buffer.h": "c"
+    "ring_buffer.h": "c",
+    "typeinfo": "c",
+    "usb_device.h": "c",
+    "sample_usbd.h": "c"
+  },
+  "nrf-connect.debugging.bindings": {
+    "${workspaceFolder}/projects/nrf/build": "Launch build",
+    "${workspaceFolder}/projects/nrf/build/nrf": "Launch build"
   }
 }

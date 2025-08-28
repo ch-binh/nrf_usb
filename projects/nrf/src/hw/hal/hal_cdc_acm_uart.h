@@ -15,12 +15,8 @@
  ******************************************************************************
  */
 
-#ifndef HAL_UART_H
-#define HAL_UART_H
-
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
+#ifndef HAL_CDC_ASM_UART_H
+#define HAL_CDC_ASM_UART_H
 
 /* Includes ----------------------------------------------------------------- */
 /* Standard libraries */
@@ -34,12 +30,24 @@
 /* Structures --------------------------------------------------------------- */
 /* Error codes -------------------------------------------------------------- */
 /* Function prototypes ------------------------------------------------------ */
+
+/**
+ * @brief
+ *
+ * @return * void
+ */
+void hal_uart_init(void);
+
+/**
+ * @brief
+ *
+ */
+void hal_uart_deinit(void);
+
+void hal_uart_set_irq(void);
+
 /* Inline functions --------------------------------------------------------- */
 
-// #ifdef __cplusplus
-// }
-// #endif
-
-#endif /* HAL_UART_H */
+#endif /* HAL_CDC_ASM_UART_H */
 
 /* End of File -------------------------------------------------------------- */

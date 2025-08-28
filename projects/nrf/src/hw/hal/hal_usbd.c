@@ -35,7 +35,7 @@ static struct usbd_context *sample_usbd;
 
 /* Private function prototypes ---------------------------------------------- */
 static int         enable_usb_device_next(void);
-static void        sample_msg_cb(struct usbd_context *const ctx, const struct usbd_msg *msg);
+static void        hal_usb_init_cb(struct usbd_context *const ctx, const struct usbd_msg *msg);
 static inline void print_baudrate(const struct device *dev);
 
 /* Exported functions ------------------------------------------------------- */
@@ -62,11 +62,16 @@ int hal_usbd_enable(void)
  *
  */
 
+/**
+ * @brief
+ *
+ * @return int
+ */
 static int enable_usb_device_next(void)
 {
   int err;
 
-  sample_usbd = sample_usbd_init_device(sample_msg_cb);
+  sample_usbd = sample_usbd_init_device(hal_usb_init_cb);
   if (sample_usbd == NULL)
   {
     LOG_ERR("Failed to initialize USB device");
@@ -88,7 +93,13 @@ static int enable_usb_device_next(void)
   return 0;
 }
 
-static void sample_msg_cb(struct usbd_context *const ctx, const struct usbd_msg *msg)
+/**
+ * @brief
+ *
+ * @param[in] ctx
+ * @param[in] msg
+ */
+static void hal_usb_init_cb(struct usbd_context *const ctx, const struct usbd_msg *msg)
 {
   LOG_INF("USBD message: %s", usbd_msg_type_string(msg->type));
 

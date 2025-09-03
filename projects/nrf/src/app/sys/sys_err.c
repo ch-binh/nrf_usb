@@ -1,10 +1,7 @@
 /**
  *******************************************************************************
- * @file
- * @brief Sample echo app for CDC ACM class
- *
- * Sample app for USB CDC ACM class driver. The received data is echoed back
- * to the serial port.
+ * @file    template_module.c
+ * @brief   [Short module description, e.g.] Implementation for Template Module
  * @details This file implements functions declared in `template_module.h`.
  *          Structured for maintainable and modular embedded C development.
  *
@@ -16,21 +13,15 @@
  */
 
 /* Includes ----------------------------------------------------------------- */
+#include "sys_err.h"
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+LOG_MODULE_REGISTER(SYS_ERR, LOG_LEVEL_INF);
+
 /* Private includes --------------------------------------------------------- */
-#include "main.h"
-
-#include "hal_usbd.h"
-#include "hal_cdc_acm_uart.h"
-
-LOG_MODULE_REGISTER(cdc_acm_echo, LOG_LEVEL_INF);
-
 /* Private defines ---------------------------------------------------------- */
-
-K_SEM_DEFINE(dtr_sem, 0, 1);
-
 /* Private macros ----------------------------------------------------------- */
 /* Private typedefs --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
@@ -38,50 +29,16 @@ K_SEM_DEFINE(dtr_sem, 0, 1);
 /* Exported functions ------------------------------------------------------- */
 /* Private function definitions --------------------------------------------- */
 
-int sys_init(void)
+void sys_err_hardfault_handler(const char *file, int line, const char *func, unsigned int reason)
 {
-  int ret;
+  /* Infinite loop */
 
-  /* Init UART*/
-  hal_uart_init();
+  LOG_ERR("HardFault in %s at %s:%d, reason: 0x%08X", func, file, line, reason);
 
-  /* Init USBD */
-  hal_usbd_init();
+  k_sleep(K_MSEC(100)); // Allow log to flush
 
-  ret = hal_usbd_enable();
-  if (ret != 0)
-  {
-    LOG_ERR("Failed to enable USB");
-    return 0;
-  }
-
-  return 1;
-}
-
-int main(void)
-{
-  LOG_INF("START");
-
-  if (!sys_init())
-  {
-    LOG_ERR("Init module failed");
-    return 0;
-  }
-
-  LOG_INF("Wait for DTR");
-
-  k_sem_take(&dtr_sem, K_FOREVER);
-
-  LOG_INF("DTR set");
-
-  hal_uart_set_irq();
-
-  // while (1)
-  // {
-  //   k_msleep(1000);
-  // }
-
-  return 0;
+  while (1)
+    ;
 }
 
 /* End of File -------------------------------------------------------------- */

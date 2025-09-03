@@ -29,6 +29,7 @@ LOG_MODULE_REGISTER(COM_cb, LOG_LEVEL_INF);
 
 /* Private defines ---------------------------------------------------------- */
 #define RING_BUF_SIZE (1024)
+#define TTY_BUF_SIZE  (256)
 
 /* Private macros ----------------------------------------------------------- */
 /* Private typedefs --------------------------------------------------------- */
@@ -86,21 +87,28 @@ void hal_uart_deinit(void)
  * =============================================================================
  */
 
+/**
+ * @brief
+ *
+ * @param[in] dev
+ * @param[in] user_data
+ */
 static void interrupt_handler(const struct device *dev, void *user_data)
 {
   ARG_UNUSED(user_data);
 
   while (uart_irq_update(dev) && uart_irq_is_pending(dev))
   {
+    /* Fetch data if ring is not full */
     if (!rx_throttled && uart_irq_rx_ready(dev))
     {
       int     recv_len, rb_len;
-      uint8_t buffer[64];
+      uint8_t buffer[TTY_BUF_SIZE];
       size_t  len = MIN(ring_buf_space_get(&ringbuf), sizeof(buffer));
 
+      /* Throttle because ring buffer is full */
       if (len == 0)
       {
-        /* Throttle because ring buffer is full */
         uart_irq_rx_disable(dev);
         rx_throttled = true;
         continue;
@@ -119,22 +127,21 @@ static void interrupt_handler(const struct device *dev, void *user_data)
         LOG_ERR("Drop %u bytes", recv_len - rb_len);
       }
 
-      LOG_DBG("tty fifo -> ringbuf %d bytes", rb_len);
       if (rb_len)
       {
         uart_irq_tx_enable(dev);
       }
     }
 
+    /* if ring not full */
     if (uart_irq_tx_ready(dev))
     {
-      uint8_t buffer[64];
+      uint8_t buffer[TTY_BUF_SIZE];
       int     rb_len, send_len;
 
       rb_len = ring_buf_get(&ringbuf, buffer, sizeof(buffer));
       if (!rb_len)
       {
-        LOG_DBG("Ring buffer empty, disable TX IRQ");
         uart_irq_tx_disable(dev);
         continue;
       }
@@ -150,8 +157,6 @@ static void interrupt_handler(const struct device *dev, void *user_data)
       {
         LOG_ERR("Drop %d bytes", rb_len - send_len);
       }
-
-      LOG_DBG("ringbuf -> tty fifo %d bytes", send_len);
     }
   }
 }

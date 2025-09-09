@@ -1,0 +1,2 @@
+# Load Zephyr board defconfig descriptions.
+osource "D:/Projects/zephyr_boards/boards/Saki/nrf52840dk_minimal/Kconfig.defconfig"

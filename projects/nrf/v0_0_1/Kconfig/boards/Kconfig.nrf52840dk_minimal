@@ -1,0 +1,2 @@
+# Load board Kconfig descriptions.
+osource "D:/Projects/zephyr_boards/boards/Saki/nrf52840dk_minimal/Kconfig.nrf52840dk_minimal"

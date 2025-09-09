@@ -31,24 +31,11 @@ LOG_MODULE_REGISTER(hal_usbd, LOG_LEVEL_INF);
 
 #define ZEPHYR_PROJECT_USB_VID (0x2fe3)
 
-USBD_DEVICE_DEFINE(usbd_dev, DEVICE_DT_GET(DT_NODELABEL(zephyr_udc0)), ZEPHYR_PROJECT_USB_VID,
-                   CONFIG_SAMPLE_USBD_PID);
-USBD_DESC_LANG_DEFINE(sample_lang);
-USBD_DESC_MANUFACTURER_DEFINE(sample_mfr, CONFIG_SAMPLE_USBD_MANUFACTURER);
-USBD_DESC_PRODUCT_DEFINE(sample_product, CONFIG_SAMPLE_USBD_PRODUCT);
-IF_ENABLED(CONFIG_HWINFO, (USBD_DESC_SERIAL_NUMBER_DEFINE(sample_sn)));
-
-USBD_DESC_CONFIG_DEFINE(fs_cfg_desc, "FS Configuration");
-USBD_DESC_CONFIG_DEFINE(hs_cfg_desc, "HS Configuration");
-
+/* Private macros ----------------------------------------------------------- */
+/* Private typedefs --------------------------------------------------------- */
+/* Private variables -------------------------------------------------------- */
 static const uint8_t attributes = (IS_ENABLED(CONFIG_SAMPLE_USBD_SELF_POWERED) ? USB_SCD_SELF_POWERED : 0) |
                                   (IS_ENABLED(CONFIG_SAMPLE_USBD_REMOTE_WAKEUP) ? USB_SCD_REMOTE_WAKEUP : 0);
-
-/* Full speed configuration */
-USBD_CONFIGURATION_DEFINE(sample_fs_config, attributes, CONFIG_SAMPLE_USBD_MAX_POWER, &fs_cfg_desc);
-
-/* High speed configuration */
-USBD_CONFIGURATION_DEFINE(sample_hs_config, attributes, CONFIG_SAMPLE_USBD_MAX_POWER, &hs_cfg_desc);
 
 /*
  * This does not yet provide valuable information, but rather serves as an
@@ -61,11 +48,17 @@ static const struct usb_bos_capability_lpm bos_cap_lpm = {
   .bmAttributes       = 0UL,
 };
 
+USBD_DEVICE_DEFINE(usbd_dev, DEVICE_DT_GET(DT_NODELABEL(zephyr_udc0)), ZEPHYR_PROJECT_USB_VID,
+                   CONFIG_SAMPLE_USBD_PID);
+USBD_DESC_LANG_DEFINE(sample_lang);
+USBD_DESC_MANUFACTURER_DEFINE(sample_mfr, CONFIG_SAMPLE_USBD_MANUFACTURER);
+USBD_DESC_PRODUCT_DEFINE(sample_product, CONFIG_SAMPLE_USBD_PRODUCT);
+IF_ENABLED(CONFIG_HWINFO, (USBD_DESC_SERIAL_NUMBER_DEFINE(sample_sn)));
+USBD_DESC_CONFIG_DEFINE(fs_cfg_desc, "FS Configuration");
+USBD_DESC_CONFIG_DEFINE(hs_cfg_desc, "HS Configuration");
+USBD_CONFIGURATION_DEFINE(sample_fs_config, attributes, CONFIG_SAMPLE_USBD_MAX_POWER, &fs_cfg_desc);
+USBD_CONFIGURATION_DEFINE(sample_hs_config, attributes, CONFIG_SAMPLE_USBD_MAX_POWER, &hs_cfg_desc);
 USBD_DESC_BOS_DEFINE(sample_usbext, sizeof(bos_cap_lpm), &bos_cap_lpm);
-
-/* Private macros ----------------------------------------------------------- */
-/* Private typedefs --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
 
 /* Private function prototypes ---------------------------------------------- */
 static void                 hal_usb_init_cb(struct usbd_context *const ctx, const struct usbd_msg *msg);

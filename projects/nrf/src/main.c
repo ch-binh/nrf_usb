@@ -43,15 +43,13 @@ int sys_init(void)
   int ret;
 
   /* Init UART*/
-  hal_uart_init();
+  hal_cdc_init();
 
   /* Init USBD */
-  hal_usbd_init();
-
-  ret = hal_usbd_enable();
+  ret = hal_usbd_init();
   if (ret != 0)
   {
-    LOG_ERR("Failed to enable USB");
+    LOG_ERR("Failed to init or enable USB");
     return 0;
   }
 
@@ -74,7 +72,7 @@ int main(void)
 
   LOG_INF("DTR set");
 
-  hal_uart_set_irq();
+  hal_cdc_enable_irq();
 
   // while (1)
   // {

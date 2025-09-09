@@ -36,7 +36,7 @@
  *
  * @return * void
  */
-void hal_uart_init(void);
+void hal_cdc_init(void);
 
 /**
  * @brief
@@ -44,7 +44,7 @@ void hal_uart_init(void);
  */
 void hal_uart_deinit(void);
 
-void hal_uart_set_irq(void);
+void hal_cdc_enable_irq(void);
 
 /* Inline functions --------------------------------------------------------- */
 

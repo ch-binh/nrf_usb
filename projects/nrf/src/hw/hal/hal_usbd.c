@@ -66,59 +66,58 @@ USBD_DESC_BOS_DEFINE(sample_usbext, sizeof(bos_cap_lpm), &bos_cap_lpm);
 /* Private macros ----------------------------------------------------------- */
 /* Private typedefs --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
-static struct usbd_context *usbd_ctx;
 
 /* Private function prototypes ---------------------------------------------- */
-static int                  enable_usb_device_next(void);
 static void                 hal_usb_init_cb(struct usbd_context *const ctx, const struct usbd_msg *msg);
 static inline void          print_baudrate(const struct device *dev);
 static void                 sample_fix_code_triple(struct usbd_context *uds_ctx, const enum usbd_speed speed);
-static struct usbd_context *sample_usbd_setup_device(usbd_msg_cb_t msg_cb);
-static struct usbd_context *sample_usbd_init_device(usbd_msg_cb_t msg_cb);
+static struct usbd_context *hal_usbd_setup_device(usbd_msg_cb_t msg_cb);
 
 /* Exported functions ------------------------------------------------------- */
 /* Private function definitions --------------------------------------------- */
 
-void hal_usbd_init(void)
-{
-  return;
-}
-
-int hal_usbd_enable(void)
-{
-  int ret;
-
-  ret = enable_usb_device_next();
-
-  return ret;
-}
-
-/*
+/**
+ * @brief  This function setups and initializes the USB device support.
  *
- * STATIC FUNCTIONS
- * =============================================================================
- *
+ * @return int
  */
+int hal_usbd_init(void)
+{
+  int err = 0;
+
+  if (hal_usbd_setup_device(hal_usb_init_cb) == NULL)
+  {
+    return -ENODEV;
+  }
+
+  err = usbd_init(&usbd_dev);
+  if (err)
+  {
+    LOG_ERR("Failed to initialize device support");
+    return -ENODEV;
+  }
+
+  err = hal_usbd_enable();
+  if (err)
+  {
+    return err;
+  }
+
+  return err;
+}
 
 /**
  * @brief
  *
  * @return int
  */
-static int enable_usb_device_next(void)
+int hal_usbd_enable(void)
 {
   int err;
 
-  usbd_ctx = sample_usbd_init_device(hal_usb_init_cb);
-  if (usbd_ctx == NULL)
+  if (!usbd_can_detect_vbus(&usbd_dev))
   {
-    LOG_ERR("Failed to initialize USB device");
-    return -ENODEV;
-  }
-
-  if (!usbd_can_detect_vbus(usbd_ctx))
-  {
-    err = usbd_enable(usbd_ctx);
+    err = usbd_enable(&usbd_dev);
     if (err)
     {
       LOG_ERR("Failed to enable device support");
@@ -130,6 +129,44 @@ static int enable_usb_device_next(void)
 
   return 0;
 }
+
+/**
+ * @brief
+ *
+ */
+int hal_usbd_disable(void)
+{
+  int err;
+
+  err = usbd_disable(&usbd_dev);
+  if (err)
+  {
+    LOG_ERR("Failed to disable device support");
+    return err;
+  }
+
+  LOG_INF("USB device support disabled");
+
+  return 0;
+}
+
+/**
+ * @brief
+ *
+ */
+void hal_usbd_deinit(void)
+{
+  (void)hal_usbd_disable();
+  usbd_shutdown(&usbd_dev);
+  LOG_INF("USB device support deinitialized");
+}
+
+/*
+ *
+ * STATIC FUNCTIONS
+ * =============================================================================
+ *
+ */
 
 /**
  * @brief
@@ -218,37 +255,31 @@ static void sample_fix_code_triple(struct usbd_context *uds_ctx, const enum usbd
  * @param[in] msg_cb
  * @return struct usbd_context*
  */
-static struct usbd_context *sample_usbd_setup_device(usbd_msg_cb_t msg_cb)
+static struct usbd_context *hal_usbd_setup_device(usbd_msg_cb_t msg_cb)
 {
   int err;
 
-  err = usbd_add_descriptor(&usbd_dev, &sample_lang);
-  if (err)
+  /* Add descriptors */
+  struct usbd_desc_node *descs[] = {
+    &sample_lang,
+    &sample_mfr,
+    &sample_product,
+#ifdef CONFIG_HWINFO
+    &sample_sn,
+#endif
+  };
+
+  for (size_t i = 0; i < ARRAY_SIZE(descs); i++)
   {
-    LOG_ERR("Failed to initialize language descriptor (%d)", err);
-    return NULL;
+    err = usbd_add_descriptor(&usbd_dev, descs[i]);
+    if (err)
+    {
+      LOG_ERR("Failed to initialize descriptor %zu (%d)", i, err);
+      return NULL;
+    }
   }
 
-  err = usbd_add_descriptor(&usbd_dev, &sample_mfr);
-  if (err)
-  {
-    LOG_ERR("Failed to initialize manufacturer descriptor (%d)", err);
-    return NULL;
-  }
-
-  err = usbd_add_descriptor(&usbd_dev, &sample_product);
-  if (err)
-  {
-    LOG_ERR("Failed to initialize product descriptor (%d)", err);
-    return NULL;
-  }
-
-  IF_ENABLED(CONFIG_HWINFO, (err = usbd_add_descriptor(&usbd_dev, &sample_sn);))
-  if (err)
-  {
-    LOG_ERR("Failed to initialize SN descriptor (%d)", err);
-    return NULL;
-  }
+  /* Add configurations */
 
   if (usbd_caps_speed(&usbd_dev) == USBD_SPEED_HS)
   {
@@ -269,23 +300,19 @@ static struct usbd_context *sample_usbd_setup_device(usbd_msg_cb_t msg_cb)
     sample_fix_code_triple(&usbd_dev, USBD_SPEED_HS);
   }
 
-  /* doc configuration register start */
   err = usbd_add_configuration(&usbd_dev, USBD_SPEED_FS, &sample_fs_config);
   if (err)
   {
     LOG_ERR("Failed to add Full-Speed configuration");
     return NULL;
   }
-  /* doc configuration register end */
 
-  /* doc functions register start */
   err = usbd_register_all_classes(&usbd_dev, USBD_SPEED_FS, 1);
   if (err)
   {
     LOG_ERR("Failed to add register classes");
     return NULL;
   }
-  /* doc functions register end */
 
   sample_fix_code_triple(&usbd_dev, USBD_SPEED_FS);
 
@@ -313,29 +340,6 @@ static struct usbd_context *sample_usbd_setup_device(usbd_msg_cb_t msg_cb)
       return NULL;
     }
   }
-
-  ERR_HARDFAULT(1);
-
-  return &usbd_dev;
-}
-
-struct usbd_context *sample_usbd_init_device(usbd_msg_cb_t msg_cb)
-{
-  int err;
-
-  if (sample_usbd_setup_device(msg_cb) == NULL)
-  {
-    return NULL;
-  }
-
-  /* doc device init start */
-  err = usbd_init(&usbd_dev);
-  if (err)
-  {
-    LOG_ERR("Failed to initialize device support");
-    return NULL;
-  }
-  /* doc device init end */
 
   return &usbd_dev;
 }

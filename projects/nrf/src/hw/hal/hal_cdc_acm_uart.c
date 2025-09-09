@@ -40,12 +40,12 @@ struct ring_buf            ringbuf;
 static bool                rx_throttled;
 
 /* Private function prototypes ---------------------------------------------- */
-static void interrupt_handler(const struct device *dev, void *user_data);
+static void hal_cdc_irq_handler(const struct device *dev, void *user_data);
 
 /* Exported functions ------------------------------------------------------- */
 /* Private function definitions --------------------------------------------- */
 
-void hal_uart_init(void)
+void hal_cdc_init(void)
 {
   if (!device_is_ready(uart_dev))
   {
@@ -56,7 +56,7 @@ void hal_uart_init(void)
   ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
 }
 
-void hal_uart_set_irq(void)
+void hal_cdc_enable_irq(void)
 {
 
   int ret;
@@ -71,7 +71,7 @@ void hal_uart_set_irq(void)
   /* Wait 100ms for the host to do all settings */
   k_msleep(100);
 
-  uart_irq_callback_set(uart_dev, interrupt_handler);
+  uart_irq_callback_set(uart_dev, hal_cdc_irq_handler);
 
   /* Enable rx interrupts */
   uart_irq_rx_enable(uart_dev);
@@ -93,7 +93,7 @@ void hal_uart_deinit(void)
  * @param[in] dev
  * @param[in] user_data
  */
-static void interrupt_handler(const struct device *dev, void *user_data)
+static void hal_cdc_irq_handler(const struct device *dev, void *user_data)
 {
   ARG_UNUSED(user_data);
 

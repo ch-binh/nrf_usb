@@ -31,8 +31,11 @@
 /* Error codes -------------------------------------------------------------- */
 /* Function prototypes ------------------------------------------------------ */
 
-void hal_usbd_init(void);
+// Setup =======================================================================
+int  hal_usbd_init(void);
+void hal_usbd_deinit(void);
 int  hal_usbd_enable(void);
+int  hal_usbd_disable(void);
 
 /* Inline functions --------------------------------------------------------- */
 

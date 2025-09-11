@@ -1,2 +1,0 @@
-# Load Sysbuild board Kconfig descriptions.
-osource "D:/Projects/zephyr_boards/boards/Saki/nrf52840dk_minimal/Kconfig.sysbuild"

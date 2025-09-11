@@ -5,7 +5,7 @@
  * @details This file provides declarations for configuration macros, types,
  *          and public API for the Template module. Designed for embedded use.
  *
- * @date    2025/9/11
+ * @date    2025/07/04
  * @author  [Your Name]
  * @version 1.0.0
  * @license MIT
@@ -15,14 +15,11 @@
  ******************************************************************************
  */
 
-#ifndef __AT_CMD_H
-#define __AT_CMD_H
+#ifndef __AT_HANDLE_H
+#define __AT_HANDLE_H
 
 /* Includes ----------------------------------------------------------------- */
 /* Standard libraries */
-
-#include <stdint.h>
-
 /* Project-specific headers */
 /* Configuration ------------------------------------------------------------ */
 /* Public defines ----------------------------------------------------------- */
@@ -33,8 +30,6 @@
 /* Structures --------------------------------------------------------------- */
 /* Error codes -------------------------------------------------------------- */
 /* Function prototypes ------------------------------------------------------ */
-void at_process(uint8_t *data, uint8_t len);
-
 /* Inline functions --------------------------------------------------------- */
 
 #endif /* __AT_CMD_H */

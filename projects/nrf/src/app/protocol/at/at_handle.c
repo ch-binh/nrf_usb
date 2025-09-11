@@ -13,57 +13,13 @@
  */
 
 /* Includes ----------------------------------------------------------------- */
-#include <zephyr/logging/log.h>
-
-#include "at_cmd.h"
-#include <string.h>
-
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
-
-#define TAG "ATCMD"
-LOG_MODULE_REGISTER(ATCMD, LOG_LEVEL_INF);
-
-#define AT_INTERNAL_BUFFER_SIZE (256)
-
 /* Private macros ----------------------------------------------------------- */
-
 /* Private typedefs --------------------------------------------------------- */
-/* Public variables --------------------------------------------------------- */
-uint8_t g_at_buf[AT_INTERNAL_BUFFER_SIZE];
-
 /* Private variables -------------------------------------------------------- */
 /* Private function prototypes ---------------------------------------------- */
-static void at_processing_input_msg(uint8_t *data, uint8_t len);
-
 /* Exported functions ------------------------------------------------------- */
-
-void at_init(void)
-{
-}
-
-void at_deinit(void)
-{
-}
-
-void at_process(uint8_t *data, uint8_t len)
-{
-  /* Processing input */
-  at_processing_input_msg(data, len);
-
-  /* handle cmd */
-}
-
-/*
- * Private function definitions
- * =============================================================================
- */
-
-static void at_processing_input_msg(uint8_t *msg, uint8_t len)
-{
-  memset(g_at_buf, 0, AT_INTERNAL_BUFFER_SIZE);
-  memcpy(g_at_buf, msg, len - 2); // -2: remove \r\n
-  LOG_INF("AT process called: %s (%d bytes)\n", g_at_buf, len);
-}
+/* Private function definitions --------------------------------------------- */
 
 /* End of File -------------------------------------------------------------- */

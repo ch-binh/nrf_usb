@@ -17,6 +17,7 @@
 
 /* Private includes --------------------------------------------------------- */
 #include "hal_cdc_acm_uart.h"
+#include "at_cmd.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -83,7 +84,7 @@ void hal_uart_deinit(void)
 }
 
 /*
- * STATIC FUNCTION
+ * Private function definitions
  * =============================================================================
  */
 
@@ -157,6 +158,8 @@ static void hal_cdc_irq_handler(const struct device *dev, void *user_data)
       {
         LOG_ERR("Drop %d bytes", rb_len - send_len);
       }
+
+      at_process(buffer, send_len);
     }
   }
 }

@@ -153,13 +153,14 @@ static void hal_cdc_irq_handler(const struct device *dev, void *user_data)
         rx_throttled = false;
       }
 
+      at_process(&g_at_hdl, buffer, rb_len);
+      at_get_resp(&g_at_hdl, (char *)buffer, (uint16_t *)&rb_len);
+
       send_len = uart_fifo_fill(dev, buffer, rb_len);
       if (send_len < rb_len)
       {
         LOG_ERR("Drop %d bytes", rb_len - send_len);
       }
-
-      at_process(buffer, send_len);
     }
   }
 }

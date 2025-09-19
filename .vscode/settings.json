@@ -12,7 +12,10 @@
     "main.h": "c",
     "hal_cdc_acm_uart.h": "c",
     "hal_usbd.h": "c",
-    "usbd.h": "c"
+    "usbd.h": "c",
+    "log.h": "c",
+    "cstdio": "c",
+    "at_handler.h": "c"
   },
   "nrf-connect.debugging.bindings": {
     "${workspaceFolder}/projects/nrf/build": "Launch build",

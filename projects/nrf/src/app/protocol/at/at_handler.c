@@ -13,13 +13,45 @@
  */
 
 /* Includes ----------------------------------------------------------------- */
+#include "at_handler.h"
+#include <zephyr/logging/log.h>
+
 /* Private includes --------------------------------------------------------- */
 /* Private defines ---------------------------------------------------------- */
+#define TAG "ATHDL"
+LOG_MODULE_REGISTER(ATHDL, LOG_LEVEL_INF);
+
 /* Private macros ----------------------------------------------------------- */
+
 /* Private typedefs --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 /* Private function prototypes ---------------------------------------------- */
 /* Exported functions ------------------------------------------------------- */
 /* Private function definitions --------------------------------------------- */
+
+AT_HDL_FUNC(AT_ID)
+{
+  LOG_INF("AT_ID handler called");
+
+  memcpy(h->cmd.buf.out, "AT+OK\r\n", strlen("AT+OK\r\n"));
+  return;
+}
+
+AT_HDL_FUNC(AT_VER)
+{
+  LOG_INF("AT_VER handler called");
+
+  memcpy(h->cmd.buf.out, "AT+OK\r\n", strlen("AT+OK\r\n"));
+  return;
+}
+
+AT_HDL_FUNC(AT_TEST)
+{
+
+  LOG_INF("AT_TEST handler called");
+
+  memcpy(h->cmd.buf.out, "AT+OK\r\n", strlen("AT+OK\r\n"));
+  return;
+}
 
 /* End of File -------------------------------------------------------------- */

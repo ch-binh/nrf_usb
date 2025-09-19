@@ -20,5 +20,6 @@ target_include_directories(app PRIVATE
     src
     src/app/protocol/at
     src/app/sys
+    src/app/common
     src/hw/hal
 )
